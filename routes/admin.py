@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from models.reserva import Reserva
 from models.configuracion import Configuracion
 from app import db
+from routes.email_service import enviar_cambio_estado
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -74,11 +75,18 @@ def panel():
 def cambiar_estado(id):
     reserva = Reserva.query.get_or_404(id)
     nuevo   = request.form.get("estado")
+    mensaje = request.form.get("mensaje", "").strip()
+
     if nuevo in ("pendiente", "confirmada", "cancelada"):
         reserva.estado = nuevo
         db.session.commit()
-        flash(f"Reserva de {reserva.nombre} actualizada a '{nuevo}'.", "success")
-    return redirect(url_for("admin.panel"))
+
+        # Enviar email al cliente si se confirma o cancela
+        if nuevo in ("confirmada", "cancelada"):
+            enviar_cambio_estado(reserva, mensaje_personalizado=mensaje)
+
+        flash(f"Reserva de {reserva.nombre} actualizada a '{nuevo}'. Email enviado.", "success")
+    return redirect(url_for("admin.panel", estado=request.form.get("filtro_actual", "todas")))
 
 
 @admin_bp.route("/reservas/<int:id>/eliminar", methods=["POST"])
