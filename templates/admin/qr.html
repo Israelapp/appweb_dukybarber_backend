@@ -247,7 +247,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <script>
-        const url = {{ url | tojson }};
         const canvas = document.getElementById("qr-canvas");
 
         QRCode.toCanvas(canvas, url, {
