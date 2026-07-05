@@ -81,7 +81,6 @@ def cambiar_estado(id):
         reserva.estado = nuevo
         db.session.commit()
 
-        # Enviar email al cliente si se confirma o cancela
         if nuevo in ("confirmada", "cancelada"):
             enviar_cambio_estado(reserva, mensaje_personalizado=mensaje)
 
@@ -124,3 +123,18 @@ def configuracion():
 
     dias_activos = [int(d) for d in cfg.dias_trabajo.split(",") if d]
     return render_template("admin/configuracion.html", cfg=cfg, dias_activos=dias_activos)
+
+
+@admin_bp.route("/qr", methods=["GET", "POST"])
+@login_required
+def qr():
+    cfg = get_config()
+    url_default = os.getenv("APP_URL", "https://tudominio.com")
+
+    if request.method == "POST":
+        nueva_url = request.form.get("url", "").strip()
+        if nueva_url:
+            url_default = nueva_url
+            flash("QR actualizado correctamente.", "success")
+
+    return render_template("admin/qr.html", cfg=cfg, url=url_default)
