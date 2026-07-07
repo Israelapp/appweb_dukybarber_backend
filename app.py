@@ -30,7 +30,10 @@ def create_app():
     # ── Extensiones ──
     db.init_app(app)
     mail.init_app(app)
-    CORS(app, origins=["http://localhost:5173"])   # URL del frontend Vite
+    CORS(app, origins=[
+    "http://localhost:5173",
+    "https://appweb-dukybarber-frontend.vercel.app"
+])   # URL del frontend Vite
 
     # ── Blueprints ──
     from routes.reservas import reservas_bp
