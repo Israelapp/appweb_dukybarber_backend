@@ -33,6 +33,9 @@ def create_app():
     CORS(app, origins=[
     "http://localhost:5173",
     "https://appweb-dukybarber-frontend.vercel.app"
+    "https://dukybarber.es"
+    "https://www.dukybarber.es"
+
 ])   # URL del frontend Vite
 
     # ── Blueprints ──
