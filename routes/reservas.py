@@ -120,7 +120,7 @@ def crear_reserva():
     except ValueError:
         return jsonify({"ok": False, "errores": {"fecha_hora": "Formato inválido."}}), 422
 
-    cfg      = get_config()
+    cfg       = get_config()
     fecha_str = fecha.strftime("%Y-%m-%d")
     hora_str  = fecha.strftime("%H:%M")
     slots     = generar_slots(fecha_str, cfg)
@@ -137,7 +137,7 @@ def crear_reserva():
         servicio   = servicio,
         fecha_hora = fecha,
     )
- db.session.add(reserva)
+    db.session.add(reserva)
     db.session.commit()
 
     try:
