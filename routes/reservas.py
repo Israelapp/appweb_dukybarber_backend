@@ -137,11 +137,14 @@ def crear_reserva():
         servicio   = servicio,
         fecha_hora = fecha,
     )
-    db.session.add(reserva)
+ db.session.add(reserva)
     db.session.commit()
 
-    enviar_confirmacion(reserva)
-    enviar_notificacion_admin(reserva)
+    try:
+        enviar_confirmacion(reserva)
+        enviar_notificacion_admin(reserva)
+    except Exception:
+        pass
 
     return jsonify({"ok": True, "reserva": reserva.to_dict()}), 201
 

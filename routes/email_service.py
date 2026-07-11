@@ -1,15 +1,17 @@
-from flask_mail import Message
-from app import mail
+import os
+import resend
+
+resend.api_key = os.getenv("RESEND_API_KEY")
+
+# Cambia esto por "Duky Barber <reservas@dukybarber.es>" una vez que
+# verifiques el dominio dukybarber.es en Resend.
+REMITENTE = "Duky Barber <onboarding@resend.dev>"
 
 
 def enviar_confirmacion(reserva):
     """Email al crear la reserva (estado pendiente)."""
     try:
-        msg = Message(
-            subject="✂️ Reserva recibida — Duky Barber",
-            recipients=[reserva.email],
-        )
-        msg.html = f"""
+        html = f"""
         <div style="font-family:sans-serif;max-width:500px;margin:auto;background:#181818;color:#F0EDE6;padding:32px;border-radius:8px;">
           <h1 style="font-size:2rem;color:#C9A84C;margin-bottom:4px;">Duky Barber</h1>
           <p style="color:#888880;margin-bottom:24px;">Barbería profesional · Desde 2018</p>
@@ -27,10 +29,15 @@ def enviar_confirmacion(reserva):
             Te avisaremos por email en cuanto confirmemos tu cita.
           </p>
           <hr style="border-color:rgba(201,168,76,0.2);margin:24px 0;">
-          <p style="color:#888880;font-size:0.78rem;text-align:center;">© 2026 Duky Barber · Todos los derechos reservados</p>
+          <p style="color:#888880;font-size:0.78rem;text-align:center;">©️ 2026 Duky Barber · Todos los derechos reservados</p>
         </div>
         """
-        mail.send(msg)
+        resend.Emails.send({
+            "from": REMITENTE,
+            "to": [reserva.email],
+            "subject": "✂️ Reserva recibida — Duky Barber",
+            "html": html,
+        })
         return True
     except Exception as e:
         print(f"[EMAIL ERROR] {e}")
@@ -39,17 +46,12 @@ def enviar_confirmacion(reserva):
 
 def enviar_notificacion_admin(reserva):
     """Avisa al barbero de una nueva reserva."""
-    import os
-    admin_email = os.getenv("MAIL_USERNAME")
+    admin_email = os.getenv("ADMIN_EMAIL") or os.getenv("MAIL_USERNAME")
     if not admin_email:
         return
 
     try:
-        msg = Message(
-            subject=f"🔔 Nueva reserva — {reserva.nombre}",
-            recipients=[admin_email],
-        )
-        msg.html = f"""
+        html = f"""
         <div style="font-family:sans-serif;padding:24px;">
           <h2>Nueva reserva recibida</h2>
           <ul>
@@ -61,7 +63,12 @@ def enviar_notificacion_admin(reserva):
           </ul>
         </div>
         """
-        mail.send(msg)
+        resend.Emails.send({
+            "from": REMITENTE,
+            "to": [admin_email],
+            "subject": f"🔔 Nueva reserva — {reserva.nombre}",
+            "html": html,
+        })
     except Exception as e:
         print(f"[EMAIL ADMIN ERROR] {e}")
 
@@ -91,8 +98,7 @@ def enviar_cambio_estado(reserva, mensaje_personalizado=""):
             </div>
             """
 
-        msg = Message(subject=asunto, recipients=[reserva.email])
-        msg.html = f"""
+        html = f"""
         <div style="font-family:sans-serif;max-width:500px;margin:auto;background:#181818;color:#F0EDE6;padding:32px;border-radius:8px;">
           <h1 style="font-size:2rem;color:#C9A84C;margin-bottom:4px;">Duky Barber</h1>
           <p style="color:#888880;margin-bottom:24px;">Barbería profesional · Desde 2018</p>
@@ -111,10 +117,15 @@ def enviar_cambio_estado(reserva, mensaje_personalizado=""):
             Si tienes dudas, contáctanos por Instagram o Facebook.
           </p>
           <hr style="border-color:rgba(201,168,76,0.2);margin:24px 0;">
-          <p style="color:#888880;font-size:0.78rem;text-align:center;">© 2026 Duky Barber · Todos los derechos reservados</p>
+          <p style="color:#888880;font-size:0.78rem;text-align:center;">©️ 2026 Duky Barber · Todos los derechos reservados</p>
         </div>
         """
-        mail.send(msg)
+        resend.Emails.send({
+            "from": REMITENTE,
+            "to": [reserva.email],
+            "subject": asunto,
+            "html": html,
+        })
         return True
     except Exception as e:
         print(f"[EMAIL CAMBIO ESTADO ERROR] {e}")
