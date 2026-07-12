@@ -5,7 +5,7 @@ resend.api_key = os.getenv("RESEND_API_KEY")
 
 # Cambia esto por "Duky Barber <reservas@dukybarber.es>" una vez que
 # verifiques el dominio dukybarber.es en Resend.
-REMITENTE = "Duky Barber <onboarding@resend.dev>"
+REMITENTE = "Duky Barber <reservas@dukybarber.es>"
 
 
 def enviar_confirmacion(reserva):
